@@ -23,11 +23,14 @@ namespace SCL
         /// <returns>0 on success</returns>
         public static int Main(string[] args)
         {
-            // we all need ascii art :)
-            DisplayAsciiArt(args);
-
             // build the command line args
             RootCommand root = BuildRootCommand();
+
+            // an alternate approach to using the ParseResult is to build a
+            // middleware handler and inject into the pipeline before the default help handler
+
+            // we all need ascii art :)
+            DisplayAsciiArt(root.Parse(args));
 
             // invoke the correct command handler
             // once you understand what this one line of code does, it's really cool!
@@ -75,44 +78,49 @@ namespace SCL
         }
 
         // display Ascii Art
-        private static void DisplayAsciiArt(string[] args)
+        private static void DisplayAsciiArt(ParseResult parseResult)
         {
-            if (args == null || args.Length == 0 ||
-                    (!args.Contains("--version") &&
-                        (args.Contains("-h") ||
-                            args.Contains("-?") ||
-                            args.Contains("--help") ||
-                            args.Contains("--dry-run"))))
+            // --version and --help will be parsed as unmatched tokens
+            // we use ParseResult extensions to check for the unmatched tokens
+            // the default System.CommandLine middleware will handle the unmatched tokens on invoke
+
+            // don't display if --version
+            if (!parseResult.HasVersionOption())
             {
-                // you have to get the path for this to work as a dotnet tool
-                string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string file = $"{path}/files/ascii-art.txt";
-
-                try
+                // display for help or dry-run
+                if (parseResult.HasHelpOption() || parseResult.HasDryRunOption())
                 {
-                    if (File.Exists(file))
+                    // you have to get the path for this to work as a dotnet tool
+                    string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = $"{path}/files/ascii-art.txt";
+
+                    try
                     {
-                        string txt = File.ReadAllText(file);
-
-                        if (!string.IsNullOrWhiteSpace(txt))
+                        if (File.Exists(file))
                         {
-                            txt = txt.Replace("\r", string.Empty);
-                            string[] lines = txt.Split('\n');
+                            string txt = File.ReadAllText(file);
 
-                            foreach (string line in lines)
+                            if (!string.IsNullOrWhiteSpace(txt))
                             {
-                                // GEAUX Tigers!
-                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                                Console.WriteLine(line);
-                            }
+                                txt = txt.Replace("\r", string.Empty);
+                                string[] lines = txt.Split('\n');
 
-                            Console.ResetColor();
+                                foreach (string line in lines)
+                                {
+                                    // GEAUX Tigers!
+                                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                                    Console.WriteLine(line);
+                                }
+                            }
                         }
                     }
-                }
-                catch
-                {
-                    // ignore any errors
+                    catch
+                    {
+                        // ignore any errors
+                    }
+
+                    // reset the console
+                    Console.ResetColor();
                 }
             }
         }
