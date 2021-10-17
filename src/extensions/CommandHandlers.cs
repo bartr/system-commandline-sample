@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Text.Json;
 
 namespace SCL.CommandLine.Extensions
 {
@@ -32,8 +33,16 @@ namespace SCL.CommandLine.Extensions
             // --user works for Linux / Mac
             // --username works for Windows
             // by using aliases, we can support all 3 options
-            PrintConfig("Add Command", config);
-            Console.WriteLine($"    User      {config.User}");
+
+            if (config.DryRun)
+            {
+                // handle --dry-run
+            }
+
+            // replace with your implementation
+            Console.WriteLine("Add Command");
+            Console.WriteLine(JsonSerializer.Serialize<UserConfig>(config, AppConfig.JsonOptions));
+
             return 0;
         }
 
@@ -41,22 +50,40 @@ namespace SCL.CommandLine.Extensions
         /// bootstrap-add Command Handler
         ///   this uses the BootstrapConfig which requires --all or --services
         /// </summary>
-        /// <param name="bootstrapConfig">parsed command line in BootstrapConfig</param>
+        /// <param name="config">parsed command line in BootstrapConfig</param>
         /// <returns>0 on success</returns>
-        public static int DoBootstrapAddCommand(BootstrapConfig bootstrapConfig)
+        public static int DoBootstrapAddCommand(BootstrapConfig config)
         {
-            return PrintBootstrapConfig("Add Command", bootstrapConfig);
+            if (config.DryRun)
+            {
+                // handle --dry-run
+            }
+
+            // replace with your implementation
+            Console.WriteLine("Bootstrap Add Command");
+            Console.WriteLine(JsonSerializer.Serialize<BootstrapConfig>(config, AppConfig.JsonOptions));
+
+            return 0;
         }
 
         /// <summary>
         /// bootstrap-remove Command Handler
         ///   this uses the BootstrapConfig which requires --all or --services
         /// </summary>
-        /// <param name="bootstrapConfig">parsed command line in BootstrapConfig</param>
+        /// <param name="config">parsed command line in BootstrapConfig</param>
         /// <returns>0 on success</returns>
-        public static int DoBootstrapRemoveCommand(BootstrapConfig bootstrapConfig)
+        public static int DoBootstrapRemoveCommand(BootstrapConfig config)
         {
-            return PrintBootstrapConfig("Remove Command", bootstrapConfig);
+            if (config.DryRun)
+            {
+                // handle --dry-run
+            }
+
+            // replace with your implementation
+            Console.WriteLine("Bootstrap Remove Command");
+            Console.WriteLine(JsonSerializer.Serialize<BootstrapConfig>(config, AppConfig.JsonOptions));
+
+            return 0;
         }
 
         /// <summary>
@@ -67,108 +94,14 @@ namespace SCL.CommandLine.Extensions
         /// <returns>0 on success</returns>
         public static int DoBuildCommand(BuildConfig config)
         {
-            PrintConfig("Build Command", config);
-
-            Console.WriteLine($"    User      {config.BuildType}");
-
-            return 0;
-        }
-
-        /// <summary>
-        /// check Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoCheckCommand(AppConfig appConfig)
-        {
-            return PrintConfig("Check Command", appConfig);
-        }
-
-        /// <summary>
-        /// config-reset Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoConfigReset(AppConfig appConfig)
-        {
-            return PrintConfig("Config Reset", appConfig);
-        }
-
-        /// <summary>
-        /// config-update Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoConfigUpdate(AppConfig appConfig)
-        {
-            return PrintConfig("Config Update", appConfig);
-        }
-
-        /// <summary>
-        /// init Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoInitCommand(AppConfig appConfig)
-        {
-            return PrintConfig("Init Command", appConfig);
-        }
-
-        /// <summary>
-        /// logs Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoLogsCommand(AppConfig appConfig)
-        {
-            return PrintConfig("Logs Command", appConfig);
-        }
-
-        /// <summary>
-        /// remove Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoRemoveCommand(AppConfig appConfig)
-        {
-            return PrintConfig("Remove Command", appConfig);
-        }
-
-        /// <summary>
-        /// sync Command Handler
-        /// </summary>
-        /// <param name="appConfig">parsed command line in AppConfig</param>
-        /// <returns>0 on success</returns>
-        public static int DoSyncCommand(AppConfig appConfig)
-        {
-            return PrintConfig("Sync Command", appConfig);
-        }
-
-        // for debugging
-        private static int PrintConfig(string method, AppConfig config)
-        {
-            Console.WriteLine(method);
-            Console.WriteLine($"    DryRun    {config.DryRun}");
-            Console.WriteLine($"    Verbose   {config.Verbose}");
-
-            return 0;
-        }
-
-        // for debugging
-        private static int PrintBootstrapConfig(string method, BootstrapConfig config)
-        {
-            PrintConfig(method, config);
-
-            if (config.Services != null && config.Services.Count > 0)
+            if (config.DryRun)
             {
-                Console.WriteLine($"    Services  {string.Join(' ', config.Services)}");
-            }
-            else
-            {
-                Console.WriteLine("    Services  null");
+                // handle --dry-run
             }
 
-            Console.WriteLine($"    All       {config.All}");
+            // replace with your implementation
+            Console.WriteLine("Build Command");
+            Console.WriteLine(JsonSerializer.Serialize<BuildConfig>(config, AppConfig.JsonOptions));
 
             return 0;
         }

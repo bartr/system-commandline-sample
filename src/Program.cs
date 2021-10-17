@@ -5,7 +5,6 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using SCL.CommandLine.Extensions;
 
@@ -58,15 +57,18 @@ namespace SCL
             //   versionprefix and versionsuffix
 
             // add the command handlers
+
+            // example of using environment variables as default values
             root.AddAddCommand();
+
+            // example of using sub-command specific options and validation
             root.AddBootstrapCommand();
+
+            // example using an enum option with defaults
             root.AddBuildCommand();
-            root.AddCheckCommand();
-            root.AddConfigCommand();
-            root.AddInitCommand();
-            root.AddLogsCommand();
-            root.AddRemoveCommand();
-            root.AddSyncCommand();
+
+            // example using positional Arguments with validation
+            root.AddSetCommand();
 
             // add the global options
             // these options are available to all commands and sub commands
@@ -102,15 +104,9 @@ namespace SCL
 
                             if (!string.IsNullOrWhiteSpace(txt))
                             {
-                                txt = txt.Replace("\r", string.Empty);
-                                string[] lines = txt.Split('\n');
-
-                                foreach (string line in lines)
-                                {
-                                    // GEAUX Tigers!
-                                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                                    Console.WriteLine(line);
-                                }
+                                // GEAUX Tigers!
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                                Console.WriteLine(txt);
                             }
                         }
                     }
@@ -118,9 +114,11 @@ namespace SCL
                     {
                         // ignore any errors
                     }
-
-                    // reset the console
-                    Console.ResetColor();
+                    finally
+                    {
+                        // reset the console
+                        Console.ResetColor();
+                    }
                 }
             }
         }

@@ -23,7 +23,7 @@ namespace SCL.CommandLine.Extensions
         /// <param name="parent">System.CommandLine.Command</param>
         public static void AddAddCommand(this Command parent)
         {
-            Command c = new ("add", "Add the user");
+            Command c = new ("add", "example of using environment variables as default values");
             parent.AddCommand(c);
 
             // note we are using UserConfig so we can pick up the option we add below
@@ -48,31 +48,31 @@ namespace SCL.CommandLine.Extensions
         public static void AddBootstrapCommand(this Command parent)
         {
             // no handler because it's not a "leaf" command
-            Command bs = new ("bootstrap", "Manage bootstrap services");
+            Command bs = new ("bootstrap", "example of using sub-command specific options and validation");
 
             // alias because it's easier to type
             bs.AddAlias("bs");
 
             // this is a leaf command
-            Command add = new ("add", "Add bootstrap service");
+            Command add = new ("add", "example of using sub-command specific options and validation");
             add.Handler = CommandHandler.Create<BootstrapConfig>(CommandHandlers.DoBootstrapAddCommand);
 
             // these options will only be available to this command
-            // we could add as global options to the parent command
-            // I chose to do it this way to get the custom description
+            //   we could add as global options to the parent command
+            //   we chose to do it this way to get the custom description
             // Note that our handler uses a different model for the command
-            add.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "bootstrap service(s) to add"));
-            add.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "Add all bootstrap services"));
+            add.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "array of string(s)"));
+            add.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "example of using sub-command specific options and validation"));
 
             // command validator to make sure -s or -a (but not both) are provided
             add.AddValidator(ValidateBootstrapCommand);
 
             // same as add
-            Command rm = new ("remove", "Remove bootstrap service");
+            Command rm = new ("remove", "example of using sub-command specific options and validation");
             rm.AddAlias("rm");
             rm.Handler = CommandHandler.Create<BootstrapConfig>(CommandHandlers.DoBootstrapRemoveCommand);
-            rm.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "bootstrap service(s) to remove"));
-            rm.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "Remove all bootstrap services"));
+            rm.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "array of string(s)"));
+            rm.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "c"));
             rm.AddValidator(ValidateBootstrapCommand);
 
             // add the commands to the tree
@@ -88,88 +88,13 @@ namespace SCL.CommandLine.Extensions
         /// <param name="parent">System.CommandLine.Command</param>
         public static void AddBuildCommand(this Command parent)
         {
-            Command c = new ("build", "Build the app");
+            Command c = new ("build", "example using an enum option with defaults");
             c.Handler = CommandHandler.Create<BuildConfig>(CommandHandlers.DoBuildCommand);
             parent.AddCommand(c);
 
             // add an option for the BuildType enumeration
-            // BuildType.Debug is the default
+            //   BuildType.Debug is the default
             c.AddOption(new Option<BuildType>(new string[] { "--build-type", "-b" }, () => BuildType.Debug, "Build type"));
-        }
-
-        /// <summary>
-        /// Extension method to add the check command
-        /// </summary>
-        /// <param name="parent">System.CommandLine.Command</param>
-        public static void AddCheckCommand(this Command parent)
-        {
-            Command c = new ("check", "Check the app endpoint");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoCheckCommand);
-            parent.AddCommand(c);
-        }
-
-        /// <summary>
-        /// Extension method to add the config command
-        /// </summary>
-        /// <param name="parent">System.CommandLine.Command</param>
-        public static void AddConfigCommand(this Command parent)
-        {
-            Command cfg = new ("config", "Manage configuration");
-
-            Command c = new ("reset", "Reset config files to default");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoConfigReset);
-            cfg.AddCommand(c);
-
-            c = new ("update", "Get the latest config files");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoConfigUpdate);
-            cfg.AddCommand(c);
-
-            parent.AddCommand(cfg);
-        }
-
-        /// <summary>
-        /// Extension method to add the init command
-        /// </summary>
-        /// <param name="parent">System.CommandLine.Command</param>
-        public static void AddInitCommand(this Command parent)
-        {
-            Command c = new ("init", "Initialize the app");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoInitCommand);
-            parent.AddCommand(c);
-        }
-
-        /// <summary>
-        /// Extension method to add the logs command
-        /// </summary>
-        /// <param name="parent">System.CommandLine.Command</param>
-        public static void AddLogsCommand(this Command parent)
-        {
-            Command c = new ("logs", "Get the app logs");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoLogsCommand);
-            parent.AddCommand(c);
-        }
-
-        /// <summary>
-        /// Extension method to add the remove command
-        /// </summary>
-        /// <param name="parent">System.CommandLine.Command</param>
-        public static void AddRemoveCommand(this Command parent)
-        {
-            Command c = new ("remove", "Remove the app");
-            c.AddAlias("rm");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoRemoveCommand);
-            parent.AddCommand(c);
-        }
-
-        /// <summary>
-        /// Extension method to add the sync command
-        /// </summary>
-        /// <param name="parent">System.CommandLine.Command</param>
-        public static void AddSyncCommand(this Command parent)
-        {
-            Command c = new ("sync", "Sync changes");
-            c.Handler = CommandHandler.Create<AppConfig>(CommandHandlers.DoSyncCommand);
-            parent.AddCommand(c);
         }
 
         // validate the bootstrap command parameters
@@ -188,11 +113,13 @@ namespace SCL.CommandLine.Extensions
                     services = null;
                 }
 
+                // must specify --services or --all
                 if (!all && services == null)
                 {
                     msg += "--services or --all must be specified";
                 }
 
+                // can't specify both
                 if (all && services != null)
                 {
                     msg += "--services and --all cannot be combined";
