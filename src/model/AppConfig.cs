@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Text.Json;
+
 namespace SCL
 {
     /// <summary>
@@ -18,6 +20,11 @@ namespace SCL
     /// </summary>
     public class AppConfig
     {
+        /// <summary>
+        /// Gets or sets the JSON serialization options
+        /// </summary>
+        public static JsonSerializerOptions JsonOptions { get; set; } = new () { WriteIndented = true };
+
         /// <summary>
         /// Gets or sets a value indicating whether this is a dry run
         /// </summary>
