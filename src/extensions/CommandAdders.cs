@@ -58,11 +58,11 @@ namespace SCL.CommandLine.Extensions
             add.Handler = CommandHandler.Create<BootstrapConfig>(CommandHandlers.DoBootstrapAddCommand);
 
             // these options will only be available to this command
-            // we could add as global options to the parent command
-            // I chose to do it this way to get the custom description
+            //   we could add as global options to the parent command
+            //   we chose to do it this way to get the custom description
             // Note that our handler uses a different model for the command
-            add.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "bootstrap service(s) to add"));
-            add.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "Add all bootstrap services"));
+            add.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "array of string(s)"));
+            add.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "example of using sub-command specific options and validation"));
 
             // command validator to make sure -s or -a (but not both) are provided
             add.AddValidator(ValidateBootstrapCommand);
@@ -71,8 +71,8 @@ namespace SCL.CommandLine.Extensions
             Command rm = new ("remove", "example of using sub-command specific options and validation");
             rm.AddAlias("rm");
             rm.Handler = CommandHandler.Create<BootstrapConfig>(CommandHandlers.DoBootstrapRemoveCommand);
-            rm.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "bootstrap service(s) to remove"));
-            rm.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "Remove all bootstrap services"));
+            rm.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "array of string(s)"));
+            rm.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "c"));
             rm.AddValidator(ValidateBootstrapCommand);
 
             // add the commands to the tree
@@ -93,7 +93,7 @@ namespace SCL.CommandLine.Extensions
             parent.AddCommand(c);
 
             // add an option for the BuildType enumeration
-            // BuildType.Debug is the default
+            //   BuildType.Debug is the default
             c.AddOption(new Option<BuildType>(new string[] { "--build-type", "-b" }, () => BuildType.Debug, "Build type"));
         }
 
@@ -113,11 +113,13 @@ namespace SCL.CommandLine.Extensions
                     services = null;
                 }
 
+                // must specify --services or --all
                 if (!all && services == null)
                 {
                     msg += "--services or --all must be specified";
                 }
 
+                // can't specify both
                 if (all && services != null)
                 {
                     msg += "--services and --all cannot be combined";
