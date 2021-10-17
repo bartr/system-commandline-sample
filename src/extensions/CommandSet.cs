@@ -21,7 +21,9 @@ namespace SCL.CommandLine.Extensions
         // list of valid keys
         //   the format of the command is scl key value [value2 value3 ...]
         //   we could use a sub-command for "key" instead of an argument
-        //     we would create a handler per sub-command with that approach
+        //     with the Argument approach, we have to do some parsing and a switch for validation
+        //     with the sub-command approach, you have one handler per leaf command
+        //     the number and type of keys and the complexity of validation seem to drive this choice
         private static List<string> ValidKeys => new ()
         {
             "Namespace",
@@ -32,7 +34,7 @@ namespace SCL.CommandLine.Extensions
         };
 
         /// <summary>
-        /// Extension method to add the app commands
+        /// Extension method to add the set commands
         ///   this example uses Arguments as positional command line parameters
         /// </summary>
         /// <param name="parent">System.CommandLine.Command</param>
@@ -42,7 +44,6 @@ namespace SCL.CommandLine.Extensions
             // we could use a sub-command instead
             Argument<string> key = new ("key");
             key.Description = $"Value to set ({string.Join(' ', ValidKeys)})";
-            key.AddValidator(ValidateSetKey);
 
             // create the value for the value
             // note this is List<string> so multiple values can be passed
@@ -60,7 +61,7 @@ namespace SCL.CommandLine.Extensions
             parent.AddCommand(set);
         }
 
-        // validate combinations of arguments
+        // validate arguments
         private static string ValidateSet(CommandResult result)
         {
             // return non-empty string to display an error
@@ -68,61 +69,70 @@ namespace SCL.CommandLine.Extensions
 
             try
             {
+                // get the results
                 ArgumentResult keyResult = (ArgumentResult)result.Children.GetByAlias("key");
                 ArgumentResult valueResult = (ArgumentResult)result.Children.GetByAlias("value");
 
+                // let System.CommandLine handle this
                 if (keyResult == null || valueResult == null)
                 {
-                    return msg + "Failed to parse key value pair\n";
+                    return msg;
                 }
 
                 string key = keyResult.GetValueOrDefault<string>();
 
+                // validate the key - stop on error
                 if (string.IsNullOrWhiteSpace(key))
                 {
-                    msg += "Failed to parse key\n";
+                    return msg + "key argument cannot be empty\n  valid keys: {string.Join(' ', ValidKeys).Trim()}\n";
+                }
+                else
+                {
+                    // case sensitive compare against list of valid keys
+                    if (!ValidKeys.Contains(key))
+                    {
+                        return msg + $"invalid key\n  valid keys: {string.Join(' ', ValidKeys).Trim()}\n";
+                    }
                 }
 
                 List<string> values = valueResult.GetValueOrDefault<List<string>>();
 
+                // validate values - stop on error
                 if (values == null || values.Count == 0)
                 {
-                    msg += "Failed to parse value(s)\n";
+                    return msg + "Failed to parse value(s)\n";
                 }
 
-                // no parse errors
-                if (string.IsNullOrEmpty(msg))
+                // validate the value(s) based on key
+                switch (key)
                 {
-                    switch (key)
-                    {
-                        case "Port":
-                        case "NodePort":
-                            msg += ValidatePort(key, values);
-                            break;
-                        case "Args":
-                            // args takes an array of values so skip the default validation
-                            break;
-                        default:
-                            // only one value
-                            if (values.Count > 1)
-                            {
-                                msg += $"{key} only takes one value\n";
-                            }
+                    case "Port":
+                    case "NodePort":
+                        // must be integer within range
+                        return msg + ValidatePort(key, values);
+                    case "Args":
+                        // args takes an array of values so skip the default validation
+                        break;
+                    default:
+                        // only one value passed
+                        if (values.Count > 1)
+                        {
+                            return msg + $"{key} only takes one value\n";
+                        }
 
-                            break;
-                    }
+                        break;
                 }
             }
             catch (Exception ex)
             {
-                msg += $"Parsing exception: {ex.Message}\n";
+                return msg + $"Parsing exception: {ex.Message}\n";
             }
 
             return msg;
         }
 
         // validate Port and NodePort
-        //   this is an example where it would be easier to have sub-commands vs. key Argument
+        //   this is an example where it might be easier to have sub-commands vs. key Argument
         //     System.CommandLine would handle the int parsing by declaration
         private static string ValidatePort(string key, List<string> values)
         {
@@ -147,40 +157,10 @@ namespace SCL.CommandLine.Extensions
             return msg;
         }
 
-        // validate the key argument
-        private static string ValidateSetKey(ArgumentResult result)
-        {
-            // return non-empty string to display an error
-            string msg = string.Empty;
-
-            // get the key from the argument
-            string key = result.GetValueOrDefault<string>();
-
-            // validate the key
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                msg += "key argument cannot be empty\n";
-            }
-            else
-            {
-                if (!ValidKeys.Contains(key))
-                {
-                    msg += $"invalid key\n  valid keys: {string.Join(' ', ValidKeys).Trim()}\n";
-                }
-            }
-
-            // return error message(s) or string.empty
-            return msg;
-        }
-
-        /// <summary>
-        /// app set Command Handler
-        /// </summary>
-        /// <param name="config">parsed command line in AppSetConfig</param>
-        /// <returns>0 on success</returns>
+        // set Command Handler
         private static int DoSetCommand(AppSetConfig config)
         {
-            // sample implementation
+            // handle --dry-run
             if (config.DryRun)
             {
                 Console.WriteLine("Set Command");
@@ -189,6 +169,7 @@ namespace SCL.CommandLine.Extensions
                 return 0;
             }
 
+            // replace with your implementation
             Console.WriteLine("Set Command");
             Console.WriteLine(JsonSerializer.Serialize<AppSetConfig>(config, AppConfig.JsonOptions));
 
