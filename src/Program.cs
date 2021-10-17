@@ -66,6 +66,7 @@ namespace SCL
             root.AddInitCommand();
             root.AddLogsCommand();
             root.AddRemoveCommand();
+            root.AddSetCommand();
             root.AddSyncCommand();
 
             // add the global options
