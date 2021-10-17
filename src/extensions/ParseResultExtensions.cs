@@ -45,6 +45,5 @@ namespace SCL.CommandLine.Extensions
         {
             return parseResult.UnmatchedTokens.Contains("--dry-run") || parseResult.UnmatchedTokens.Contains("-d");
         }
-
     }
 }
