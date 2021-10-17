@@ -53,7 +53,7 @@ namespace SCL.CommandLine.Extensions
             value.Description = "New value(s)";
 
             // create the set command
-            Command set = new ("set", "Set application values");
+            Command set = new ("set", "example using positional Arguments with validation");
             set.AddArgument(key);
             set.AddArgument(value);
             set.AddValidator(ValidateSet);
@@ -160,13 +160,9 @@ namespace SCL.CommandLine.Extensions
         // set Command Handler
         private static int DoSetCommand(AppSetConfig config)
         {
-            // handle --dry-run
             if (config.DryRun)
             {
-                Console.WriteLine("Set Command");
-                Console.WriteLine(JsonSerializer.Serialize<AppSetConfig>(config, AppConfig.JsonOptions));
-
-                return 0;
+                // handle --dry-run
             }
 
             // replace with your implementation

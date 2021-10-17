@@ -57,16 +57,18 @@ namespace SCL
             //   versionprefix and versionsuffix
 
             // add the command handlers
+
+            // example of using environment variables as default values
             root.AddAddCommand();
+
+            // example of using sub-command specific options and validation
             root.AddBootstrapCommand();
+
+            // example using an enum option with defaults
             root.AddBuildCommand();
-            root.AddCheckCommand();
-            root.AddConfigCommand();
-            root.AddInitCommand();
-            root.AddLogsCommand();
-            root.AddRemoveCommand();
+
+            // example using positional Arguments with validation
             root.AddSetCommand();
-            root.AddSyncCommand();
 
             // add the global options
             // these options are available to all commands and sub commands
