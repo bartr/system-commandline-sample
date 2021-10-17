@@ -102,15 +102,9 @@ namespace SCL
 
                             if (!string.IsNullOrWhiteSpace(txt))
                             {
-                                txt = txt.Replace("\r", string.Empty);
-                                string[] lines = txt.Split('\n');
-
-                                foreach (string line in lines)
-                                {
-                                    // GEAUX Tigers!
-                                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                                    Console.WriteLine(line);
-                                }
+                                // GEAUX Tigers!
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                                Console.WriteLine(txt);
                             }
                         }
                     }
@@ -118,9 +112,11 @@ namespace SCL
                     {
                         // ignore any errors
                     }
-
-                    // reset the console
-                    Console.ResetColor();
+                    finally
+                    {
+                        // reset the console
+                        Console.ResetColor();
+                    }
                 }
             }
         }
