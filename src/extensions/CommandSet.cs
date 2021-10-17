@@ -27,17 +27,24 @@ namespace SCL.CommandLine.Extensions
 
         /// <summary>
         /// Extension method to add the app commands
+        ///   this example uses Arguments as positional command line values
         /// </summary>
         /// <param name="parent">System.CommandLine.Command</param>
         public static void AddSetCommand(this Command parent)
         {
+            // create the argument for the key
             Argument<string> key = new ("key");
             key.Description = $"Value to set ({string.Join(' ', ValidKeys)})";
             key.AddValidator(ValidateSetKey);
 
+            // create the value for the value
+            // note this is List<string> so multiple values can be passed
+            // Args takes multiple values
+            // Port and NodePort take integer values
             Argument<List<string>> value = new ("value");
             value.Description = "New value(s)";
 
+            // create the set command
             Command set = new ("set", "Set application values");
             set.AddArgument(key);
             set.AddArgument(value);
@@ -49,6 +56,7 @@ namespace SCL.CommandLine.Extensions
         // validate app set command
         private static string ValidateSet(CommandResult result)
         {
+            // return non-empty string to display an error
             string msg = string.Empty;
 
             return msg;
@@ -57,10 +65,13 @@ namespace SCL.CommandLine.Extensions
         // validate combinations of parameters
         private static string ValidateSetKey(ArgumentResult result)
         {
+            // return non-empty string to display an error
             string msg = string.Empty;
 
+            // get the name of the argument
             string name = result.GetValueOrDefault<string>();
 
+            // validate the key
             if (string.IsNullOrWhiteSpace(name))
             {
                 msg += "key argument cannot be empty\n";
@@ -84,6 +95,7 @@ namespace SCL.CommandLine.Extensions
         /// <returns>0 on success</returns>
         private static int DoAppSetCommand(AppSetConfig config)
         {
+            // sample implementation
             if (config.DryRun)
             {
                 Console.WriteLine("Set Command");
