@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Text.Json;
 
@@ -57,7 +56,7 @@ namespace SCL.CommandLine.Extensions
             set.AddArgument(key);
             set.AddArgument(value);
             set.AddValidator(ValidateSet);
-            set.Handler = CommandHandler.Create<AppSetConfig>(DoSetCommand);
+            set.SetHandler((AppSetConfig config) => { DoSetCommand(config); });
             parent.AddCommand(set);
         }
 
@@ -70,8 +69,21 @@ namespace SCL.CommandLine.Extensions
             try
             {
                 // get the results
-                ArgumentResult keyResult = (ArgumentResult)result.Children.GetByAlias("key");
-                ArgumentResult valueResult = (ArgumentResult)result.Children.GetByAlias("value");
+                // TODO - this returns null
+                ArgumentResult keyResult = result.FindResultFor(new Argument("key"));
+                ArgumentResult valueResult = result.FindResultFor(new Argument("value"));
+
+                foreach (ArgumentResult ar in result.Children)
+                {
+                    if (ar.Argument.Name == "key")
+                    {
+                        keyResult = ar;
+                    }
+                    else if (ar.Argument.Name == "value")
+                    {
+                        valueResult = ar;
+                    }
+                }
 
                 // let System.CommandLine handle this
                 if (keyResult == null || valueResult == null)

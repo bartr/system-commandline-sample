@@ -36,6 +36,10 @@ namespace SCL
             // we add a command handler for each of the leaf commands and this automatically calls that handler
             // no switch or if statements!
             // allows for super clean code with no parsing!
+
+            // TODO - --help and -h are not being handled with the new version of System.CommandLine
+            // TODO - --version is not being handled with the new version of System.CommandLine
+            // TODO - System.ArgumentException: Service not found for type SCL.AppSetConfig
             return root.Invoke(args);
         }
 

@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq;
 
@@ -27,7 +26,7 @@ namespace SCL.CommandLine.Extensions
             parent.AddCommand(c);
 
             // note we are using UserConfig so we can pick up the option we add below
-            c.Handler = CommandHandler.Create<UserConfig>(CommandHandlers.DoAddCommand);
+            c.SetHandler((UserConfig config) => { CommandHandlers.DoAddCommand(config); });
 
             // loading from env var using the EnvVarOptions extension
             //   this will pickup the user from the env vars
@@ -55,7 +54,7 @@ namespace SCL.CommandLine.Extensions
 
             // this is a leaf command
             Command add = new ("add", "example of using sub-command specific options and validation");
-            add.Handler = CommandHandler.Create<BootstrapConfig>(CommandHandlers.DoBootstrapAddCommand);
+            add.SetHandler((BootstrapConfig config) => { CommandHandlers.DoBootstrapAddCommand(config); });
 
             // these options will only be available to this command
             //   we could add as global options to the parent command
@@ -70,7 +69,7 @@ namespace SCL.CommandLine.Extensions
             // same as add
             Command rm = new ("remove", "example of using sub-command specific options and validation");
             rm.AddAlias("rm");
-            rm.Handler = CommandHandler.Create<BootstrapConfig>(CommandHandlers.DoBootstrapRemoveCommand);
+            rm.SetHandler((BootstrapConfig config) => { CommandHandlers.DoBootstrapRemoveCommand(config); });
             rm.AddOption(new Option<List<string>>(new string[] { "--services", "-s" }, "array of string(s)"));
             rm.AddOption(new Option<bool>(new string[] { "--all", "-a" }, "c"));
             rm.AddValidator(ValidateBootstrapCommand);
@@ -89,7 +88,7 @@ namespace SCL.CommandLine.Extensions
         public static void AddBuildCommand(this Command parent)
         {
             Command c = new ("build", "example using an enum option with defaults");
-            c.Handler = CommandHandler.Create<BuildConfig>(CommandHandlers.DoBuildCommand);
+            c.SetHandler((BuildConfig config) => { CommandHandlers.DoBuildCommand(config); });
             parent.AddCommand(c);
 
             // add an option for the BuildType enumeration
